@@ -1,0 +1,29 @@
+ngx_addon_name=ngx_http_auth_rbac_module
+
+ngx_module_type=HTTP
+ngx_module_name="ngx_http_auth_rbac_module"
+ngx_module_deps="\
+  $ngx_addon_dir/src/ngx_http_auth_rbac_module.h \
+  $ngx_addon_dir/src/ngx_rbac_policy.h \
+  $ngx_addon_dir/src/ngx_rbac_matcher.h \
+  $ngx_addon_dir/src/ngx_rbac_role.h \
+  $ngx_addon_dir/src/ngx_rbac_variable.h \
+"
+ngx_module_incs="$ngx_addon_dir/src"
+ngx_module_srcs="\
+  $ngx_addon_dir/src/ngx_http_auth_rbac_module.c \
+  $ngx_addon_dir/src/ngx_rbac_policy.c \
+  $ngx_addon_dir/src/ngx_rbac_matcher.c \
+  $ngx_addon_dir/src/ngx_rbac_role.c \
+  $ngx_addon_dir/src/ngx_rbac_variable.c \
+"
+ngx_module_libs=""
+
+# Optional: jansson support for JSON role parsing
+if pkg-config --exists jansson 2>/dev/null; then
+    have=NGX_RBAC_HAVE_JANSSON . auto/have
+    ngx_module_incs="${ngx_module_incs} $(pkg-config --cflags-only-I jansson | sed 's/-I//g')"
+    ngx_module_libs="${ngx_module_libs} $(pkg-config --libs jansson)"
+fi
+
+. auto/module
