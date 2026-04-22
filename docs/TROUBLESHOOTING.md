@@ -53,7 +53,7 @@ add_header X-RBAC-Result $rbac_result always;
 **Check**:
 
 - Was jansson installed when the module was built?
-- Is `NGX_RBAC_HAVE_JANSSON` defined?
+- Is `NGX_RBAC_HAVE_JSON` defined?
 
 **Resolution**: Install jansson and rebuild the module.
 
