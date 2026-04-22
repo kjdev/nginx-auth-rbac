@@ -8,86 +8,78 @@
 #include "ngx_rbac_role.h"
 #include "ngx_rbac_policy.h"
 
-#if (NGX_RBAC_HAVE_JANSSON)
-#include <jansson.h>
+#if (NGX_RBAC_HAVE_JSON)
+#include "nxe_json.h"
 #endif
 
 
-#if (NGX_RBAC_HAVE_JANSSON)
+#if (NGX_RBAC_HAVE_JSON)
 static ngx_array_t *
 ngx_rbac_extract_roles_json(ngx_http_request_t *r, ngx_str_t *value)
 {
-    json_t *root, *elem;
-    json_error_t error;
+    nxe_json_t *root, *elem;
     ngx_array_t *roles;
     ngx_str_t *role;
-    const char *str;
+    ngx_str_t str;
     size_t i, len;
-    char *buf;
 
-    /* jansson requires null-terminated string */
-    buf = ngx_pnalloc(r->pool, value->len + 1);
-    if (buf == NULL) {
-        return NULL;
-    }
-
-    ngx_memcpy(buf, value->data, value->len);
-    buf[value->len] = '\0';
-
-    root = json_loads(buf, 0, &error);
+    /*
+     * auth_rbac_role values come from nginx variables populated by
+     * authentication modules (JWT claims, upstream headers, etc.).
+     * Even signature-verified JWT payloads have attacker-controlled
+     * structure, so parse with the DoS-protected variant.
+     */
+    root = nxe_json_parse_untrusted(value, r->pool);
     if (root == NULL) {
         ngx_log_error(NGX_LOG_WARN, r->connection->log, 0,
-                      "rbac: JSON parse failed: %s", error.text);
+                      "rbac: JSON parse failed");
         return NULL;
     }
 
-    if (!json_is_array(root)) {
+    if (!nxe_json_is_array(root)) {
         ngx_log_error(NGX_LOG_WARN, r->connection->log, 0,
                       "rbac: JSON role value is not an array");
-        json_decref(root);
+        nxe_json_free(root);
         return NULL;
     }
 
-    len = json_array_size(root);
+    len = nxe_json_array_size(root);
     if (len == 0) {
-        json_decref(root);
+        nxe_json_free(root);
         return NULL;
     }
 
     roles = ngx_array_create(r->pool, len, sizeof(ngx_str_t));
     if (roles == NULL) {
-        json_decref(root);
+        nxe_json_free(root);
         return NULL;
     }
 
     for (i = 0; i < len; i++) {
-        elem = json_array_get(root, i);
-        if (!json_is_string(elem)) {
-            continue;
-        }
+        /* borrowed reference; do not free */
+        elem = nxe_json_array_get(root, i);
 
-        str = json_string_value(elem);
-        if (str == NULL || json_string_length(elem) == 0) {
+        if (nxe_json_string(elem, &str) != NGX_OK || str.len == 0) {
             continue;
         }
 
         role = ngx_array_push(roles);
         if (role == NULL) {
-            json_decref(root);
+            nxe_json_free(root);
             return NULL;
         }
 
-        role->len = json_string_length(elem);
+        role->len = str.len;
         role->data = ngx_pnalloc(r->pool, role->len);
         if (role->data == NULL) {
-            json_decref(root);
+            nxe_json_free(root);
             return NULL;
         }
 
-        ngx_memcpy(role->data, str, role->len);
+        ngx_memcpy(role->data, str.data, role->len);
     }
 
-    json_decref(root);
+    nxe_json_free(root);
 
     if (roles->nelts == 0) {
         return NULL;
@@ -183,7 +175,7 @@ ngx_rbac_extract_roles(ngx_http_request_t *r, ngx_str_t *value,
         return NULL;
     }
 
-#if (NGX_RBAC_HAVE_JANSSON)
+#if (NGX_RBAC_HAVE_JSON)
     if (separator->len == 4
         && ngx_strncmp(separator->data, "json", 4) == 0)
     {
