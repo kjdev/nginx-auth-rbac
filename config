@@ -19,9 +19,21 @@ ngx_module_srcs="\
 "
 ngx_module_libs=""
 
-# Optional: JSON role parsing via nxe-json (requires jansson).
-# If jansson is unavailable, the module builds without JSON support.
-if pkg-config --exists jansson 2>/dev/null; then
+# JSON role parsing via nxe-json (requires jansson).
+# Controlled by NGX_RBAC_JSON:
+#   yes (default) — enable JSON support; jansson is required at link time
+#   no            — disable JSON support entirely
+ngx_rbac_json="${NGX_RBAC_JSON:-yes}"
+
+case "$ngx_rbac_json" in
+    yes|no) ;;
+    *)
+        echo "$0: error: NGX_RBAC_JSON must be yes|no (got \"$ngx_rbac_json\")" >&2
+        exit 1
+        ;;
+esac
+
+if [ "$ngx_rbac_json" = "yes" ]; then
     have=NGX_RBAC_HAVE_JSON . auto/have
 
     nxe_json_dir="$ngx_addon_dir/nxe-json"
