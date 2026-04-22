@@ -48,24 +48,22 @@ add_header X-RBAC-Result $rbac_result always;
 
 ## JSON role parsing fails
 
-**Cause**: The module was built without the jansson library, but `auth_rbac_role_separator json` is being used.
+**Cause**: The module was built without JSON role parsing support, but `auth_rbac_role_separator json` is being used.
 
 **Check**:
 
-- Was jansson installed when the module was built?
+- Was the module built with `NGX_RBAC_JSON=yes`?
+- Was the `nxe-json` submodule initialized before building?
 - Is `NGX_RBAC_HAVE_JSON` defined?
 
-**Resolution**: Install jansson and rebuild the module.
+**Resolution**: Initialize the `nxe-json` submodule and rebuild with `NGX_RBAC_JSON=yes`.
 
 ```bash
-# Debian/Ubuntu
-apt-get install libjansson-dev
-
-# RHEL/CentOS/Fedora
-dnf install jansson-devel
+# Initialize the nxe-json submodule
+git submodule update --init --recursive
 ```
 
-If jansson is not available, pass roles as a comma-separated string instead.
+If the module was not built with `NGX_RBAC_JSON=yes`, pass roles as a comma-separated string instead.
 
 ## Regex paths do not work
 
