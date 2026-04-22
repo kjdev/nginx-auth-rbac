@@ -5,7 +5,7 @@
 - nginx 1.18.0 or later (with dynamic module support)
 - C compiler (GCC / Clang)
 - PCRE library (included in the nginx build)
-- jansson library (optional, for JSON role parsing)
+- jansson library (required by default; not needed when `NGX_RBAC_JSON=no`)
 
 ## Building
 
@@ -28,9 +28,9 @@ make modules
 ls objs/ngx_http_auth_rbac_module.so
 ```
 
-### Building with jansson Support
+### Installing jansson
 
-If jansson is installed, it will be detected automatically and JSON role parsing will be enabled.
+The default build (`NGX_RBAC_JSON=yes`) requires jansson at link time. Install it in advance:
 
 ```bash
 # Debian/Ubuntu
@@ -41,6 +41,33 @@ dnf install jansson-devel
 
 # macOS
 brew install jansson
+```
+
+### Controlling JSON Role Parsing at Build Time
+
+The `NGX_RBAC_JSON` environment variable selects the build-time behavior:
+
+| Value | Behavior |
+|---|---|
+| `yes` (default) | Enable JSON support; requires the `nxe-json` submodule and jansson at link time |
+| `no` | Disable JSON support explicitly; the `nxe-json` submodule is not referenced |
+
+When building with `NGX_RBAC_JSON=yes`, initialize the `nxe-json` submodule before running `configure`:
+
+```bash
+# Clone with submodules
+git clone --recursive https://github.com/kjdev/nginx-auth-rbac
+
+# Or, if you already cloned without --recursive
+git submodule update --init --recursive
+```
+
+With the default setting, linking fails when jansson is not installed.
+For builds that do not need JSON role parsing, disable it explicitly (submodule initialization can also be skipped):
+
+```bash
+# Minimal build without jansson
+NGX_RBAC_JSON=no ./configure --add-dynamic-module=..
 ```
 
 ## Installation
