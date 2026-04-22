@@ -19,11 +19,24 @@ ngx_module_srcs="\
 "
 ngx_module_libs=""
 
-# Optional: jansson support for JSON role parsing
+# Optional: JSON role parsing via nxe-json (requires jansson).
+# If jansson is unavailable, the module builds without JSON support.
 if pkg-config --exists jansson 2>/dev/null; then
-    have=NGX_RBAC_HAVE_JANSSON . auto/have
-    ngx_module_incs="${ngx_module_incs} $(pkg-config --cflags-only-I jansson | sed 's/-I//g')"
-    ngx_module_libs="${ngx_module_libs} $(pkg-config --libs jansson)"
+    have=NGX_RBAC_HAVE_JSON . auto/have
+
+    nxe_json_dir="$ngx_addon_dir/nxe-json"
+
+    if [ ! -f "$nxe_json_dir/config.ngx" ]; then
+        echo "$0: error: $nxe_json_dir/config.ngx not found" >&2
+        exit 1
+    fi
+
+    . "$nxe_json_dir/config.ngx"
+
+    ngx_module_deps="${ngx_module_deps} ${nxe_json_module_deps}"
+    ngx_module_incs="${ngx_module_incs} ${nxe_json_module_incs}"
+    ngx_module_srcs="${ngx_module_srcs} ${nxe_json_module_srcs}"
+    ngx_module_libs="${ngx_module_libs} ${nxe_json_module_libs}"
 fi
 
 . auto/module
