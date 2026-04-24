@@ -1,5 +1,11 @@
 # Changelog
 
+## [d33485b](../../commit/d33485b) - 2026-04-24
+
+### Changed
+
+- Bump `nxe-json` submodule to 0.2.0 (zero-clears extractor out-params on failure; also adds `nxe_json_object_get_integer` / `_get_boolean`, not consumed by this module yet)
+
 ## [a2a0c65](../../commit/a2a0c65) - 2026-04-22
 
 ### Added
