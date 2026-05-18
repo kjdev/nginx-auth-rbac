@@ -9,7 +9,7 @@ permissions: {}
 
 env:
   container: ${{ github.repository }}/nginx
-  archive: ${{ github.event.repository.name }}-${{ replace(github.event.release.tag_name, '/', '-') }}-full
+  archive: ${{ github.event.repository.name }}-${{ github.event.release.tag_name }}-full
 
 defaults:
   run:
