@@ -1,5 +1,11 @@
 # Changelog
 
+## [ffac8b8](../../commit/ffac8b8) - 2026-06-04
+
+### Changed
+
+- Bump `nxe-json` submodule to 0.5.0 (NUL-terminated stringify buffers, sorted compact serializer, object iteration API, deep copy, and scalar constructors; none consumed by this module yet)
+
 ## [d33485b](../../commit/d33485b) - 2026-04-24
 
 ### Changed
