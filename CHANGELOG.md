@@ -1,18 +1,15 @@
 # Changelog
 
-## [ffac8b8](../../commit/ffac8b8) - 2026-06-04
+The format is based on [Keep a Changelog](https://keepachangelog.com/),
+and this project adheres to [Semantic Versioning](https://semver.org/).
 
-### Changed
+## [0.2.1] - 2026-06-04
+
+### Dependencies
 
 - Bump `nxe-json` submodule to 0.5.0 (NUL-terminated stringify buffers, sorted compact serializer, object iteration API, deep copy, and scalar constructors; none consumed by this module yet)
 
-## [d33485b](../../commit/d33485b) - 2026-04-24
-
-### Changed
-
-- Bump `nxe-json` submodule to 0.2.0 (zero-clears extractor out-params on failure; also adds `nxe_json_object_get_integer` / `_get_boolean`, not consumed by this module yet)
-
-## [a2a0c65](../../commit/a2a0c65) - 2026-04-22
+## [0.2.0] - 2026-05-18
 
 ### Added
 
@@ -20,26 +17,11 @@
 
 ### Changed
 
+- JSON role parsing (`auth_rbac_role_separator json`) now goes through the `nxe-json` submodule's `nxe_json_parse_untrusted()`, which applies depth, array-size, string-length, and object-key-count limits in addition to the previous size cap and duplicate-key rejection. Inputs exceeding these limits fail closed (role value rejected, request denied)
 - Default build now requires jansson at link time (previously JSON support was silently disabled when jansson was missing). To build without jansson, set `NGX_RBAC_JSON=no`
+- Building from source now requires initializing the `nxe-json` submodule (`git clone --recursive` or `git submodule update --init --recursive`)
 
-## [87b4812](../../commit/87b4812) - 2026-04-22
-
-### Changed
-
-- Replace direct `jansson` calls in JSON role parsing (`auth_rbac_role_separator json`) with the `nxe_json` API from the `nxe-json` submodule. Parsing now goes through `nxe_json_parse_untrusted()`, which applies depth, array-size, string-length, and object-key-count limits in addition to the previous size cap and duplicate-key rejection. Inputs exceeding these limits fail closed (role value rejected, request denied)
-- Rename build-time feature flag `NGX_RBAC_HAVE_JANSSON` to `NGX_RBAC_HAVE_JSON`
-
-## [edbe198](../../commit/edbe198) - 2026-04-22
-
-### Added
-
-- Add `nxe-json` 0.1.0 submodule under `nxe-json/` (jansson wrapper with built-in size, depth, array, string, and key-count limits)
-
-### Changed
-
-- Building from source now requires initializing the submodule (`git clone --recursive` or `git submodule update --init --recursive`)
-
-## [b48c50b](../../commit/b48c50b) - 2026-03-24
+## [0.1.0] - 2026-03-24
 
 ### Added
 
