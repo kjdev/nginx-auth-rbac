@@ -5,6 +5,8 @@
  * nginx RBAC (Role-Based Access Control) module
  */
 
+#include "nxe_phase.h"
+
 #include "ngx_http_auth_rbac_module.h"
 #include "ngx_rbac_policy.h"
 #include "ngx_rbac_matcher.h"
@@ -226,18 +228,15 @@ ngx_http_auth_rbac_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
 static ngx_int_t
 ngx_http_auth_rbac_init(ngx_conf_t *cf)
 {
-    ngx_http_handler_pt *h;
-    ngx_http_core_main_conf_t *cmcf;
     ngx_http_variable_t *var, *v;
 
-    cmcf = ngx_http_conf_get_module_main_conf(cf, ngx_http_core_module);
-
-    h = ngx_array_push(&cmcf->phases[NGX_HTTP_PRECONTENT_PHASE].handlers);
-    if (h == NULL) {
+    if (nxe_phase_add_handler(cf, NGX_HTTP_PRECONTENT_PHASE,
+                              NXE_PHASE_PRIO_RBAC, ngx_http_auth_rbac_handler,
+                              "auth_rbac")
+        != NGX_OK)
+    {
         return NGX_ERROR;
     }
-
-    *h = ngx_http_auth_rbac_handler;
 
     /* Register variables */
     for (v = ngx_http_auth_rbac_vars; v->name.len; v++) {

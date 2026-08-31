@@ -1,23 +1,39 @@
 ngx_addon_name=ngx_http_auth_rbac_module
 
+# --- submodule: nxe-phase ---
+nxe_phase_dir="$ngx_addon_dir/nxe-phase"
+nxe_phase_tag="auth_rbac"
+
+if [ ! -f "$nxe_phase_dir/config.ngx" ]; then
+    echo "$0: error: $nxe_phase_dir/config.ngx not found" >&2
+    exit 1
+fi
+
+. "$nxe_phase_dir/config.ngx"
+
 ngx_module_type=HTTP
-ngx_module_name="ngx_http_auth_rbac_module"
+ngx_module_name="ngx_http_auth_rbac_module $nxe_phase_module_name"
 ngx_module_deps="\
+  $nxe_phase_module_deps \
   $ngx_addon_dir/src/ngx_http_auth_rbac_module.h \
   $ngx_addon_dir/src/ngx_rbac_policy.h \
   $ngx_addon_dir/src/ngx_rbac_matcher.h \
   $ngx_addon_dir/src/ngx_rbac_role.h \
   $ngx_addon_dir/src/ngx_rbac_variable.h \
 "
-ngx_module_incs="$ngx_addon_dir/src"
+ngx_module_incs="\
+  $nxe_phase_module_incs \
+  $ngx_addon_dir/src \
+"
 ngx_module_srcs="\
+  $nxe_phase_module_srcs \
   $ngx_addon_dir/src/ngx_http_auth_rbac_module.c \
   $ngx_addon_dir/src/ngx_rbac_policy.c \
   $ngx_addon_dir/src/ngx_rbac_matcher.c \
   $ngx_addon_dir/src/ngx_rbac_role.c \
   $ngx_addon_dir/src/ngx_rbac_variable.c \
 "
-ngx_module_libs=""
+ngx_module_libs="$nxe_phase_module_libs"
 
 # JSON role parsing via nxe-json (requires jansson).
 # Controlled by NGX_RBAC_JSON:

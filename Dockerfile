@@ -31,6 +31,7 @@ EOS
 COPY config /build/
 COPY src/ /build/src/
 COPY nxe-json/ /build/nxe-json/
+COPY nxe-phase/ /build/nxe-phase/
 
 WORKDIR /build/nginx
 RUN sh -ex <<'EOS'
