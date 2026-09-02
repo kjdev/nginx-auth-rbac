@@ -5,6 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-09-02
+
 ### Changed
 
 - The module now registers its PRECONTENT-phase handler at a fixed priority via the new `nxe-phase` submodule instead of relying on module load order, so its position relative to other dynamic modules sharing the same phase (`auth_gate`, `auth_cedar`, `internal_redirect`, ...) no longer depends on `load_module` ordering in `nginx.conf`
